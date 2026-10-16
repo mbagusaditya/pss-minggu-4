@@ -21,3 +21,26 @@ class Course(models.Model):
 
         def __str__(self):
             return f"{self.code} - {self.title}"
+
+
+class Lesson(models.Model):
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="lessons",
+    )
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    order = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        ordering = ["course", "order"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["course", "order"],
+                name="unique_lesson_order_per_course",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.course.code} - {self.title}"
