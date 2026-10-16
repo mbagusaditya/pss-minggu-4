@@ -19,8 +19,8 @@ class Course(models.Model):
     class Meta:
         ordering = ["code"]
 
-        def __str__(self):
-            return f"{self.code} - {self.title}"
+    def __str__(self):
+        return f"{self.code} - {self.title}"
 
 
 class Lesson(models.Model):
@@ -44,3 +44,29 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.course.code} - {self.title}"
+
+
+class Enrollment(models.Model):
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="enrollments",
+        limit_choices_to={"role": "STUDENT"},
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="enrollments",
+    )
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "course"],
+                name="unique_student_course",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.student.username} -> {self.course.code}"
