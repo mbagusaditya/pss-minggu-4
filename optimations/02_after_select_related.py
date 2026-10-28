@@ -6,13 +6,13 @@ from django.test.utils import CaptureQueriesContext
 from catalog.models import Course
 
 start = time.perf_counter()
+with CaptureQueriesContext(connection) as ctx:
+    result = []
     courses = (
         Course.objects.filter(code__startswith="PERF")
         .order_by("code")
         .select_related("lecturer")[:100]
     )
-    result = []
-    courses = Course.objects.filter(code__startswith="PERF").order_by("code").select_related("lecturer")[:100]
     for course in courses:
         result.append((course.title, course.lecturer.username))
 
